@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/terraprovider/go-exoscc/purview"
 	"github.com/terraprovider/terraform-provider-scc/internal/clients"
@@ -63,6 +64,7 @@ func (d *filePlanPropertyReferenceIdListDataSource) Read(ctx context.Context, re
 	for _, obj := range res.Value {
 		var e filePlanPropertyReferenceIdModel
 		readFilePlanPropertyReferenceId(ctx, obj, &e)
+		e.Identity = types.StringValue(firstNonEmptyStr(getString(obj, "Identity"), getString(obj, "Guid"), getString(obj, "Name")))
 		data.Items = append(data.Items, e)
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

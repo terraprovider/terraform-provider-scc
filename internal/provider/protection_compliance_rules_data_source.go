@@ -67,6 +67,7 @@ func (d *protectionComplianceRuleListDataSource) Read(ctx context.Context, req d
 	for _, obj := range res.Value {
 		var e protectionComplianceRuleModel
 		readProtectionComplianceRule(ctx, obj, &e)
+		e.Identity = types.StringValue(firstNonEmptyStr(getString(obj, "Identity"), getString(obj, "Guid"), getString(obj, "Name")))
 		data.Items = append(data.Items, e)
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/terraprovider/go-exoscc/purview"
 	"github.com/terraprovider/terraform-provider-scc/internal/clients"
@@ -67,6 +68,7 @@ func (d *unifiedAuditLogRetentionPolicyListDataSource) Read(ctx context.Context,
 	for _, obj := range res.Value {
 		var e unifiedAuditLogRetentionPolicyModel
 		readUnifiedAuditLogRetentionPolicy(ctx, obj, &e)
+		e.Identity = types.StringValue(firstNonEmptyStr(getString(obj, "Identity"), getString(obj, "Guid"), getString(obj, "UserId"), getString(obj, "Name")))
 		data.Items = append(data.Items, e)
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

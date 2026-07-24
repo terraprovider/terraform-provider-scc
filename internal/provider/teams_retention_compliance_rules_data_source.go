@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/terraprovider/go-exoscc/purview"
 	"github.com/terraprovider/terraform-provider-scc/internal/clients"
@@ -66,6 +67,7 @@ func (d *teamsRetentionComplianceRuleListDataSource) Read(ctx context.Context, r
 	for _, obj := range res.Value {
 		var e teamsRetentionComplianceRuleModel
 		readTeamsRetentionComplianceRule(ctx, obj, &e)
+		e.Identity = types.StringValue(firstNonEmptyStr(getString(obj, "Identity"), getString(obj, "Guid"), getString(obj, "Name")))
 		data.Items = append(data.Items, e)
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

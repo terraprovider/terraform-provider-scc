@@ -71,6 +71,7 @@ func (d *supervisoryReviewPolicyV2ListDataSource) Read(ctx context.Context, req 
 	for _, obj := range res.Value {
 		var e supervisoryReviewPolicyV2Model
 		readSupervisoryReviewPolicyV2(ctx, obj, &e)
+		e.Identity = types.StringValue(firstNonEmptyStr(getString(obj, "Identity"), getString(obj, "Guid"), getString(obj, "Name")))
 		data.Items = append(data.Items, e)
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
