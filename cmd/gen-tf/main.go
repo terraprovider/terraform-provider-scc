@@ -87,7 +87,12 @@ func main() {
 
 	check(os.MkdirAll(out, 0o755))
 	for _, f := range files {
-		check(os.WriteFile(filepath.Join(out, f.Name), f.Content, 0o644))
+		content := f.Content
+		if patch, ok := dlpReadbackPatches[f.Name]; ok {
+			content, err = patch(content)
+			check(err)
+		}
+		check(os.WriteFile(filepath.Join(out, f.Name), content, 0o644))
 	}
 	fmt.Printf("generated %d resource(s), %d file(s) -> %s\n", len(resources), len(files), out)
 	if len(skipped) > 0 {
@@ -141,6 +146,15 @@ func buildResource(noun string, verbs map[string]spec.Cmdlet, byNoun map[string]
 		if !ok {
 			continue // unmappable (any/int/complex)
 		}
+		object := goType(p) == "any"
+		if dlpIdentityCollections[noun][name] {
+			// The cmdlet catalog only records System.Object for these, but the
+			// service read-back is a JSON array (workload scope identities, or
+			// notification values). Expose them as string sets so Read can
+			// observe every element instead of stringifying the array.
+			at = genframework.TypeStringSet
+			object = false
+		}
 		field := exportName(name)
 		_, inC := inNew[name]
 		_, inU := inSet[name]
@@ -161,7 +175,7 @@ func buildResource(noun string, verbs map[string]spec.Cmdlet, byNoun map[string]
 			Description: describe(name, p),
 			InCreate:    inC,
 			InUpdate:    inU,
-			Object:      goType(p) == "any",
+			Object:      object,
 		})
 	}
 	if !hasCreateAttr(attrs) {
@@ -388,6 +402,22 @@ func identityFieldFor(c spec.Cmdlet, noun string) string {
 		return ids[0]
 	}
 	return ""
+}
+
+// dlpIdentityCollections lists System.Object parameters on the DLP resources
+// whose service read-back is a JSON array: workload scope locations (array of
+// identity objects) and NotifyUser (array of scalar notification values). The
+// catalog carries no declared element type for them, so they are enumerated
+// here; everything else keeps the generic mapping.
+var dlpIdentityCollections = map[string]map[string]bool{
+	"DlpCompliancePolicy": {
+		"ExchangeLocation":   true,
+		"OneDriveLocation":   true,
+		"SharePointLocation": true,
+	},
+	"DlpComplianceRule": {
+		"NotifyUser": true,
+	},
 }
 
 func attrType(p spec.Param) (genframework.AttrType, bool) {

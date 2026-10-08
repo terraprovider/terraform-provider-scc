@@ -174,7 +174,7 @@ type dlpComplianceRuleModel struct {
 	NotifyPolicyTipCustomTextTranslations        types.String `tfsdk:"notify_policy_tip_custom_text_translations"`
 	NotifyPolicyTipDisplayOption                 types.String `tfsdk:"notify_policy_tip_display_option"`
 	NotifyPolicyTipUrl                           types.String `tfsdk:"notify_policy_tip_url"`
-	NotifyUser                                   types.String `tfsdk:"notify_user"`
+	NotifyUser                                   types.Set    `tfsdk:"notify_user"`
 	NotifyUserType                               types.String `tfsdk:"notify_user_type"`
 	OnPremisesScannerDlpRestrictions             types.Set    `tfsdk:"on_premises_scanner_dlp_restrictions"`
 	Policy                                       types.String `tfsdk:"policy"`
@@ -233,6 +233,7 @@ func (r *dlpComplianceRuleResource) Metadata(_ context.Context, req resource.Met
 
 func (r *dlpComplianceRuleResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Version:     1,
 		Description: "Manages the DlpComplianceRule object via New-DlpComplianceRule / Get-DlpComplianceRule / Set-DlpComplianceRule / Remove-DlpComplianceRule.",
 		Attributes: map[string]schema.Attribute{
 			"id":                    schema.StringAttribute{Computed: true, Description: "Object identifier (GUID).", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
@@ -375,7 +376,7 @@ func (r *dlpComplianceRuleResource) Schema(_ context.Context, _ resource.SchemaR
 			"notify_policy_tip_custom_text_translations":          schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -NotifyPolicyTipCustomTextTranslations parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"notify_policy_tip_display_option":                    schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -NotifyPolicyTipDisplayOption parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"notify_policy_tip_url":                               schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -NotifyPolicyTipUrl parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-			"notify_user":                                         schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -NotifyUser parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
+			"notify_user":                                         schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -NotifyUser parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
 			"notify_user_type":                                    schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -NotifyUserType parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"on_premises_scanner_dlp_restrictions":                schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -OnPremisesScannerDlpRestrictions parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
 			"policy":                                              schema.StringAttribute{Required: true, Description: "Maps to the -Policy parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
@@ -445,27 +446,27 @@ func (r *dlpComplianceRuleResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	p := purview.NewDlpComplianceRuleParams{
-		AccessedBy:                                  toStringSlice(ctx, plan.AccessedBy, &resp.Diagnostics),
-		AccessedByMemberOf:                          toStringSlice(ctx, plan.AccessedByMemberOf, &resp.Diagnostics),
-		AdvancedRule:                                plan.AdvancedRule.ValueString(),
-		ApplyBrandingTemplate:                       plan.ApplyBrandingTemplate.ValueString(),
-		AttachmentIsNotLabeled:                      plan.AttachmentIsNotLabeled.ValueBool(),
-		BlockAccess:                                 plan.BlockAccess.ValueBool(),
-		Comment:                                     plan.Comment.ValueString(),
-		ContentContainsSensitiveInformation:         toStringSlice(ctx, plan.ContentContainsSensitiveInformation, &resp.Diagnostics),
-		ContentIsNotLabeled:                         plan.ContentIsNotLabeled.ValueBool(),
-		ContentIsShared:                             plan.ContentIsShared.ValueBool(),
-		Disabled:                                    plan.Disabled.ValueBool(),
-		DisplayName:                                 plan.DisplayName.ValueString(),
-		DocumentCreatedByMemberOf:                   toStringSlice(ctx, plan.DocumentCreatedByMemberOf, &resp.Diagnostics),
-		DocumentIsPasswordProtected:                 plan.DocumentIsPasswordProtected.ValueBool(),
-		DocumentIsUnsupported:                       plan.DocumentIsUnsupported.ValueBool(),
-		EndpointDlpBrowserRestrictions:              toStringSlice(ctx, plan.EndpointDlpBrowserRestrictions, &resp.Diagnostics),
-		EndpointDlpRestrictions:                     toStringSlice(ctx, plan.EndpointDlpRestrictions, &resp.Diagnostics),
-		EnforcePortalAccess:                         plan.EnforcePortalAccess.ValueBool(),
-		EvaluateRulePerComponent:                    plan.EvaluateRulePerComponent.ValueBool(),
-		ExceptIfAccessedBy:                          toStringSlice(ctx, plan.ExceptIfAccessedBy, &resp.Diagnostics),
-		ExceptIfAccessedByMemberOf:                  toStringSlice(ctx, plan.ExceptIfAccessedByMemberOf, &resp.Diagnostics),
+		AccessedBy:                          toStringSlice(ctx, plan.AccessedBy, &resp.Diagnostics),
+		AccessedByMemberOf:                  toStringSlice(ctx, plan.AccessedByMemberOf, &resp.Diagnostics),
+		AdvancedRule:                        plan.AdvancedRule.ValueString(),
+		ApplyBrandingTemplate:               plan.ApplyBrandingTemplate.ValueString(),
+		AttachmentIsNotLabeled:              plan.AttachmentIsNotLabeled.ValueBool(),
+		BlockAccess:                         plan.BlockAccess.ValueBool(),
+		Comment:                             plan.Comment.ValueString(),
+		ContentContainsSensitiveInformation: toStringSlice(ctx, plan.ContentContainsSensitiveInformation, &resp.Diagnostics),
+		ContentIsNotLabeled:                 plan.ContentIsNotLabeled.ValueBool(),
+		ContentIsShared:                     plan.ContentIsShared.ValueBool(),
+		Disabled:                            plan.Disabled.ValueBool(),
+		DisplayName:                         plan.DisplayName.ValueString(),
+		DocumentCreatedByMemberOf:           toStringSlice(ctx, plan.DocumentCreatedByMemberOf, &resp.Diagnostics),
+		DocumentIsPasswordProtected:         plan.DocumentIsPasswordProtected.ValueBool(),
+		DocumentIsUnsupported:               plan.DocumentIsUnsupported.ValueBool(),
+		EndpointDlpBrowserRestrictions:      toStringSlice(ctx, plan.EndpointDlpBrowserRestrictions, &resp.Diagnostics),
+		EndpointDlpRestrictions:             toStringSlice(ctx, plan.EndpointDlpRestrictions, &resp.Diagnostics),
+		EnforcePortalAccess:                 plan.EnforcePortalAccess.ValueBool(),
+		EvaluateRulePerComponent:            plan.EvaluateRulePerComponent.ValueBool(),
+		ExceptIfAccessedBy:                  toStringSlice(ctx, plan.ExceptIfAccessedBy, &resp.Diagnostics),
+		ExceptIfAccessedByMemberOf:          toStringSlice(ctx, plan.ExceptIfAccessedByMemberOf, &resp.Diagnostics),
 		ExceptIfContentContainsSensitiveInformation: toStringSlice(ctx, plan.ExceptIfContentContainsSensitiveInformation, &resp.Diagnostics),
 		ExceptIfContentIsShared:                     plan.ExceptIfContentIsShared.ValueBool(),
 		ExceptIfDocumentCreatedByMemberOf:           toStringSlice(ctx, plan.ExceptIfDocumentCreatedByMemberOf, &resp.Diagnostics),
@@ -781,7 +782,7 @@ func (r *dlpComplianceRuleResource) Create(ctx context.Context, req resource.Cre
 	if v := plan.NotifyPolicyTipDisplayOption.ValueString(); v != "" {
 		p.NotifyPolicyTipDisplayOption = v
 	}
-	if v := plan.NotifyUser.ValueString(); v != "" {
+	if v := toStringSlice(ctx, plan.NotifyUser, &resp.Diagnostics); len(v) > 0 {
 		p.NotifyUser = v
 	}
 	if v := plan.NotifyUserType.ValueString(); v != "" {
@@ -1244,7 +1245,7 @@ func (r *dlpComplianceRuleResource) Update(ctx context.Context, req resource.Upd
 		sp.NotifyPolicyTipDisplayOption = v
 	}
 	sp.NotifyPolicyTipUrl = plan.NotifyPolicyTipUrl.ValueString()
-	if v := plan.NotifyUser.ValueString(); v != "" {
+	if v := toStringSlice(ctx, plan.NotifyUser, &resp.Diagnostics); len(v) > 0 {
 		sp.NotifyUser = v
 	}
 	if v := plan.NotifyUserType.ValueString(); v != "" {
@@ -1464,7 +1465,6 @@ func (r *dlpComplianceRuleResource) Update(ctx context.Context, req resource.Upd
 		"NotifyPolicyTipCustomTextTranslations":        cfg.NotifyPolicyTipCustomTextTranslations,
 		"NotifyPolicyTipDisplayOption":                 cfg.NotifyPolicyTipDisplayOption,
 		"NotifyPolicyTipUrl":                           cfg.NotifyPolicyTipUrl,
-		"NotifyUser":                                   cfg.NotifyUser,
 		"NotifyUserType":                               cfg.NotifyUserType,
 		"PrependSubject":                               cfg.PrependSubject,
 		"Priority":                                     cfg.Priority,
@@ -1697,7 +1697,7 @@ func readDlpComplianceRule(ctx context.Context, obj map[string]any, m *dlpCompli
 	m.NotifyPolicyTipCustomTextTranslations = types.StringValue(getString(obj, "NotifyPolicyTipCustomTextTranslations"))
 	m.NotifyPolicyTipDisplayOption = types.StringValue(getString(obj, "NotifyPolicyTipDisplayOption"))
 	m.NotifyPolicyTipUrl = types.StringValue(getString(obj, "NotifyPolicyTipUrl"))
-	m.NotifyUser = types.StringValue(getString(obj, "NotifyUser"))
+	m.NotifyUser = stringSetValue(ctx, getIdentitySlice(obj, "NotifyUser"))
 	m.NotifyUserType = types.StringValue(getString(obj, "NotifyUserType"))
 	m.OnPremisesScannerDlpRestrictions = stringSetValue(ctx, getStringSlice(obj, "OnPremisesScannerDlpRestrictions"))
 	m.Policy = types.StringValue(getString(obj, "Policy"))
@@ -1890,7 +1890,7 @@ func (r *dlpComplianceRuleResource) reconcileState(cfg, read *dlpComplianceRuleM
 	read.NotifyPolicyTipCustomTextTranslations = reconcile.KeepStr(cfg.NotifyPolicyTipCustomTextTranslations, read.NotifyPolicyTipCustomTextTranslations)
 	read.NotifyPolicyTipDisplayOption = reconcile.KeepStr(cfg.NotifyPolicyTipDisplayOption, read.NotifyPolicyTipDisplayOption)
 	read.NotifyPolicyTipUrl = reconcile.KeepStr(cfg.NotifyPolicyTipUrl, read.NotifyPolicyTipUrl)
-	read.NotifyUser = reconcile.KeepStr(cfg.NotifyUser, read.NotifyUser)
+	read.NotifyUser = reconcile.KeepSet(cfg.NotifyUser, read.NotifyUser)
 	read.NotifyUserType = reconcile.KeepStr(cfg.NotifyUserType, read.NotifyUserType)
 	read.OnPremisesScannerDlpRestrictions = reconcile.KeepSet(cfg.OnPremisesScannerDlpRestrictions, read.OnPremisesScannerDlpRestrictions)
 	read.Policy = reconcile.KeepStr(cfg.Policy, read.Policy)

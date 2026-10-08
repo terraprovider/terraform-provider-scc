@@ -64,7 +64,7 @@ type dlpCompliancePolicyModel struct {
 	ExceptIfOneDriveSharedByMemberOf            types.Set    `tfsdk:"except_if_one_drive_shared_by_member_of"`
 	ExchangeAdaptiveScopes                      types.String `tfsdk:"exchange_adaptive_scopes"`
 	ExchangeAdaptiveScopesException             types.String `tfsdk:"exchange_adaptive_scopes_exception"`
-	ExchangeLocation                            types.String `tfsdk:"exchange_location"`
+	ExchangeLocation                            types.Set    `tfsdk:"exchange_location"`
 	ExchangeOnPremisesLocation                  types.String `tfsdk:"exchange_on_premises_location"`
 	ExchangeSender                              types.Set    `tfsdk:"exchange_sender"`
 	ExchangeSenderException                     types.Set    `tfsdk:"exchange_sender_exception"`
@@ -79,7 +79,7 @@ type dlpCompliancePolicyModel struct {
 	OnPremisesScannerDlpLocationException       types.String `tfsdk:"on_premises_scanner_dlp_location_exception"`
 	OneDriveAdaptiveScopes                      types.String `tfsdk:"one_drive_adaptive_scopes"`
 	OneDriveAdaptiveScopesException             types.String `tfsdk:"one_drive_adaptive_scopes_exception"`
-	OneDriveLocation                            types.String `tfsdk:"one_drive_location"`
+	OneDriveLocation                            types.Set    `tfsdk:"one_drive_location"`
 	OneDriveLocationException                   types.String `tfsdk:"one_drive_location_exception"`
 	OneDriveSharedBy                            types.Set    `tfsdk:"one_drive_shared_by"`
 	OneDriveSharedByMemberOf                    types.Set    `tfsdk:"one_drive_shared_by_member_of"`
@@ -106,7 +106,7 @@ type dlpCompliancePolicyModel struct {
 	RetryDistribution                           types.Bool   `tfsdk:"retry_distribution"`
 	SharePointAdaptiveScopes                    types.String `tfsdk:"share_point_adaptive_scopes"`
 	SharePointAdaptiveScopesException           types.String `tfsdk:"share_point_adaptive_scopes_exception"`
-	SharePointLocation                          types.String `tfsdk:"share_point_location"`
+	SharePointLocation                          types.Set    `tfsdk:"share_point_location"`
 	SharePointLocationException                 types.String `tfsdk:"share_point_location_exception"`
 	SharePointOnPremisesLocationException       types.String `tfsdk:"share_point_on_premises_location_exception"`
 	SharePointServerLocation                    types.String `tfsdk:"share_point_server_location"`
@@ -126,6 +126,7 @@ func (r *dlpCompliancePolicyResource) Metadata(_ context.Context, req resource.M
 
 func (r *dlpCompliancePolicyResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Version:     1,
 		Description: "Manages the DlpCompliancePolicy object via New-DlpCompliancePolicy / Get-DlpCompliancePolicy / Set-DlpCompliancePolicy / Remove-DlpCompliancePolicy.",
 		Attributes: map[string]schema.Attribute{
 			"id":                                   schema.StringAttribute{Computed: true, Description: "Object identifier (GUID).", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
@@ -158,7 +159,7 @@ func (r *dlpCompliancePolicyResource) Schema(_ context.Context, _ resource.Schem
 			"except_if_one_drive_shared_by_member_of":           schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -ExceptIfOneDriveSharedByMemberOf parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
 			"exchange_adaptive_scopes":                          schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -ExchangeAdaptiveScopes parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"exchange_adaptive_scopes_exception":                schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -ExchangeAdaptiveScopesException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-			"exchange_location":                                 schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -ExchangeLocation parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
+			"exchange_location":                                 schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -ExchangeLocation parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.RequiresReplace(), setplanmodifier.UseStateForUnknown()}},
 			"exchange_on_premises_location":                     schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -ExchangeOnPremisesLocation parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
 			"exchange_sender":                                   schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -ExchangeSender parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
 			"exchange_sender_exception":                         schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -ExchangeSenderException parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
@@ -173,7 +174,7 @@ func (r *dlpCompliancePolicyResource) Schema(_ context.Context, _ resource.Schem
 			"on_premises_scanner_dlp_location_exception":        schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -OnPremisesScannerDlpLocationException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
 			"one_drive_adaptive_scopes":                         schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -OneDriveAdaptiveScopes parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"one_drive_adaptive_scopes_exception":               schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -OneDriveAdaptiveScopesException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-			"one_drive_location":                                schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -OneDriveLocation parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
+			"one_drive_location":                                schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -OneDriveLocation parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.RequiresReplace(), setplanmodifier.UseStateForUnknown()}},
 			"one_drive_location_exception":                      schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -OneDriveLocationException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
 			"one_drive_shared_by":                               schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -OneDriveSharedBy parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
 			"one_drive_shared_by_member_of":                     schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -OneDriveSharedByMemberOf parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.UseStateForUnknown()}},
@@ -200,7 +201,7 @@ func (r *dlpCompliancePolicyResource) Schema(_ context.Context, _ resource.Schem
 			"retry_distribution":                                schema.BoolAttribute{Optional: true, Computed: true, Description: "Maps to the -RetryDistribution parameter.", PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()}},
 			"share_point_adaptive_scopes":                       schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointAdaptiveScopes parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 			"share_point_adaptive_scopes_exception":             schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointAdaptiveScopesException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-			"share_point_location":                              schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointLocation parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
+			"share_point_location":                              schema.SetAttribute{ElementType: types.StringType, Optional: true, Computed: true, Description: "Maps to the -SharePointLocation parameter.", PlanModifiers: []planmodifier.Set{setplanmodifier.RequiresReplace(), setplanmodifier.UseStateForUnknown()}},
 			"share_point_location_exception":                    schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointLocationException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
 			"share_point_on_premises_location_exception":        schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointOnPremisesLocationException parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
 			"share_point_server_location":                       schema.StringAttribute{Optional: true, Computed: true, Description: "Maps to the -SharePointServerLocation parameter.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace(), stringplanmodifier.UseStateForUnknown()}},
@@ -246,6 +247,15 @@ func (r *dlpCompliancePolicyResource) Create(ctx context.Context, req resource.C
 		OneDriveSharedByMemberOf:         toStringSlice(ctx, plan.OneDriveSharedByMemberOf, &resp.Diagnostics),
 		ValidatePolicy:                   plan.ValidatePolicy.ValueBool(),
 	}
+	if v := toStringSlice(ctx, plan.ExchangeLocation, &resp.Diagnostics); len(v) > 0 {
+		p.ExchangeLocation = v
+	}
+	if v := toStringSlice(ctx, plan.OneDriveLocation, &resp.Diagnostics); len(v) > 0 {
+		p.OneDriveLocation = v
+	}
+	if v := toStringSlice(ctx, plan.SharePointLocation, &resp.Diagnostics); len(v) > 0 {
+		p.SharePointLocation = v
+	}
 	if v := plan.EndpointDlpAdaptiveScopes.ValueString(); v != "" {
 		p.EndpointDlpAdaptiveScopes = v
 	}
@@ -267,9 +277,6 @@ func (r *dlpCompliancePolicyResource) Create(ctx context.Context, req resource.C
 	if v := plan.ExchangeAdaptiveScopesException.ValueString(); v != "" {
 		p.ExchangeAdaptiveScopesException = v
 	}
-	if v := plan.ExchangeLocation.ValueString(); v != "" {
-		p.ExchangeLocation = v
-	}
 	if v := plan.ExchangeOnPremisesLocation.ValueString(); v != "" {
 		p.ExchangeOnPremisesLocation = v
 	}
@@ -290,9 +297,6 @@ func (r *dlpCompliancePolicyResource) Create(ctx context.Context, req resource.C
 	}
 	if v := plan.OneDriveAdaptiveScopesException.ValueString(); v != "" {
 		p.OneDriveAdaptiveScopesException = v
-	}
-	if v := plan.OneDriveLocation.ValueString(); v != "" {
-		p.OneDriveLocation = v
 	}
 	if v := plan.OneDriveLocationException.ValueString(); v != "" {
 		p.OneDriveLocationException = v
@@ -317,9 +321,6 @@ func (r *dlpCompliancePolicyResource) Create(ctx context.Context, req resource.C
 	}
 	if v := plan.SharePointAdaptiveScopesException.ValueString(); v != "" {
 		p.SharePointAdaptiveScopesException = v
-	}
-	if v := plan.SharePointLocation.ValueString(); v != "" {
-		p.SharePointLocation = v
 	}
 	if v := plan.SharePointLocationException.ValueString(); v != "" {
 		p.SharePointLocationException = v
@@ -704,7 +705,7 @@ func readDlpCompliancePolicy(ctx context.Context, obj map[string]any, m *dlpComp
 	m.ExceptIfOneDriveSharedByMemberOf = stringSetValue(ctx, getStringSlice(obj, "ExceptIfOneDriveSharedByMemberOf"))
 	m.ExchangeAdaptiveScopes = types.StringValue(getString(obj, "ExchangeAdaptiveScopes"))
 	m.ExchangeAdaptiveScopesException = types.StringValue(getString(obj, "ExchangeAdaptiveScopesException"))
-	m.ExchangeLocation = types.StringValue(getString(obj, "ExchangeLocation"))
+	m.ExchangeLocation = stringSetValue(ctx, getIdentitySlice(obj, "ExchangeLocation"))
 	m.ExchangeOnPremisesLocation = types.StringValue(getString(obj, "ExchangeOnPremisesLocation"))
 	m.ExchangeSender = stringSetValue(ctx, getStringSlice(obj, "ExchangeSender"))
 	m.ExchangeSenderException = stringSetValue(ctx, getStringSlice(obj, "ExchangeSenderException"))
@@ -719,7 +720,7 @@ func readDlpCompliancePolicy(ctx context.Context, obj map[string]any, m *dlpComp
 	m.OnPremisesScannerDlpLocationException = types.StringValue(getString(obj, "OnPremisesScannerDlpLocationException"))
 	m.OneDriveAdaptiveScopes = types.StringValue(getString(obj, "OneDriveAdaptiveScopes"))
 	m.OneDriveAdaptiveScopesException = types.StringValue(getString(obj, "OneDriveAdaptiveScopesException"))
-	m.OneDriveLocation = types.StringValue(getString(obj, "OneDriveLocation"))
+	m.OneDriveLocation = stringSetValue(ctx, getIdentitySlice(obj, "OneDriveLocation"))
 	m.OneDriveLocationException = types.StringValue(getString(obj, "OneDriveLocationException"))
 	m.OneDriveSharedBy = stringSetValue(ctx, getStringSlice(obj, "OneDriveSharedBy"))
 	m.OneDriveSharedByMemberOf = stringSetValue(ctx, getStringSlice(obj, "OneDriveSharedByMemberOf"))
@@ -746,7 +747,7 @@ func readDlpCompliancePolicy(ctx context.Context, obj map[string]any, m *dlpComp
 	m.RetryDistribution = types.BoolValue(getBool(obj, "RetryDistribution"))
 	m.SharePointAdaptiveScopes = types.StringValue(getString(obj, "SharePointAdaptiveScopes"))
 	m.SharePointAdaptiveScopesException = types.StringValue(getString(obj, "SharePointAdaptiveScopesException"))
-	m.SharePointLocation = types.StringValue(getString(obj, "SharePointLocation"))
+	m.SharePointLocation = stringSetValue(ctx, getIdentitySlice(obj, "SharePointLocation"))
 	m.SharePointLocationException = types.StringValue(getString(obj, "SharePointLocationException"))
 	m.SharePointOnPremisesLocationException = types.StringValue(getString(obj, "SharePointOnPremisesLocationException"))
 	m.SharePointServerLocation = types.StringValue(getString(obj, "SharePointServerLocation"))
@@ -790,7 +791,7 @@ func (r *dlpCompliancePolicyResource) reconcileState(cfg, read *dlpCompliancePol
 	read.ExceptIfOneDriveSharedByMemberOf = reconcile.KeepSet(cfg.ExceptIfOneDriveSharedByMemberOf, read.ExceptIfOneDriveSharedByMemberOf)
 	read.ExchangeAdaptiveScopes = reconcile.KeepStr(cfg.ExchangeAdaptiveScopes, read.ExchangeAdaptiveScopes)
 	read.ExchangeAdaptiveScopesException = reconcile.KeepStr(cfg.ExchangeAdaptiveScopesException, read.ExchangeAdaptiveScopesException)
-	read.ExchangeLocation = reconcile.KeepStr(cfg.ExchangeLocation, read.ExchangeLocation)
+	read.ExchangeLocation = reconcile.KeepSet(cfg.ExchangeLocation, read.ExchangeLocation)
 	read.ExchangeOnPremisesLocation = reconcile.KeepStr(cfg.ExchangeOnPremisesLocation, read.ExchangeOnPremisesLocation)
 	read.ExchangeSender = reconcile.KeepSet(cfg.ExchangeSender, read.ExchangeSender)
 	read.ExchangeSenderException = reconcile.KeepSet(cfg.ExchangeSenderException, read.ExchangeSenderException)
@@ -805,7 +806,7 @@ func (r *dlpCompliancePolicyResource) reconcileState(cfg, read *dlpCompliancePol
 	read.OnPremisesScannerDlpLocationException = reconcile.KeepStr(cfg.OnPremisesScannerDlpLocationException, read.OnPremisesScannerDlpLocationException)
 	read.OneDriveAdaptiveScopes = reconcile.KeepStr(cfg.OneDriveAdaptiveScopes, read.OneDriveAdaptiveScopes)
 	read.OneDriveAdaptiveScopesException = reconcile.KeepStr(cfg.OneDriveAdaptiveScopesException, read.OneDriveAdaptiveScopesException)
-	read.OneDriveLocation = reconcile.KeepStr(cfg.OneDriveLocation, read.OneDriveLocation)
+	read.OneDriveLocation = reconcile.KeepSet(cfg.OneDriveLocation, read.OneDriveLocation)
 	read.OneDriveLocationException = reconcile.KeepStr(cfg.OneDriveLocationException, read.OneDriveLocationException)
 	read.OneDriveSharedBy = reconcile.KeepSet(cfg.OneDriveSharedBy, read.OneDriveSharedBy)
 	read.OneDriveSharedByMemberOf = reconcile.KeepSet(cfg.OneDriveSharedByMemberOf, read.OneDriveSharedByMemberOf)
@@ -832,7 +833,7 @@ func (r *dlpCompliancePolicyResource) reconcileState(cfg, read *dlpCompliancePol
 	read.RetryDistribution = reconcile.KeepBool(cfg.RetryDistribution, read.RetryDistribution)
 	read.SharePointAdaptiveScopes = reconcile.KeepStr(cfg.SharePointAdaptiveScopes, read.SharePointAdaptiveScopes)
 	read.SharePointAdaptiveScopesException = reconcile.KeepStr(cfg.SharePointAdaptiveScopesException, read.SharePointAdaptiveScopesException)
-	read.SharePointLocation = reconcile.KeepStr(cfg.SharePointLocation, read.SharePointLocation)
+	read.SharePointLocation = reconcile.KeepSet(cfg.SharePointLocation, read.SharePointLocation)
 	read.SharePointLocationException = reconcile.KeepStr(cfg.SharePointLocationException, read.SharePointLocationException)
 	read.SharePointOnPremisesLocationException = reconcile.KeepStr(cfg.SharePointOnPremisesLocationException, read.SharePointOnPremisesLocationException)
 	read.SharePointServerLocation = reconcile.KeepStr(cfg.SharePointServerLocation, read.SharePointServerLocation)
