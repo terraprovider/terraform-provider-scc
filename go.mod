@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
 	github.com/hashicorp/terraform-plugin-testing v1.16.0
-	github.com/terraprovider/go-exoscc v0.2.0
+	github.com/terraprovider/go-exoscc v0.3.0
 )
 
 require (
@@ -41,7 +41,7 @@ require (
 )
 
 require (
-	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.2 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.9.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -60,8 +60,8 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/oklog/run v1.2.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
-	github.com/terraprovider/go-msadmin v0.2.0
-	github.com/terraprovider/tf-msadmin v0.4.0
+	github.com/terraprovider/go-msadmin v0.3.1
+	github.com/terraprovider/tf-msadmin v0.9.4
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
