@@ -178,7 +178,7 @@ func (d *dlpComplianceRuleListDataSource) Schema(_ context.Context, _ datasource
 				"notify_policy_tip_custom_text_translations":          schema.StringAttribute{Computed: true, Description: "Maps to the -NotifyPolicyTipCustomTextTranslations parameter."},
 				"notify_policy_tip_display_option":                    schema.StringAttribute{Computed: true, Description: "Maps to the -NotifyPolicyTipDisplayOption parameter."},
 				"notify_policy_tip_url":                               schema.StringAttribute{Computed: true, Description: "Maps to the -NotifyPolicyTipUrl parameter."},
-				"notify_user":                                         schema.StringAttribute{Computed: true, Description: "Maps to the -NotifyUser parameter."},
+				"notify_user":                                         schema.SetAttribute{ElementType: types.StringType, Computed: true, Description: "Maps to the -NotifyUser parameter."},
 				"notify_user_type":                                    schema.StringAttribute{Computed: true, Description: "Maps to the -NotifyUserType parameter."},
 				"on_premises_scanner_dlp_restrictions":                schema.SetAttribute{ElementType: types.StringType, Computed: true, Description: "Maps to the -OnPremisesScannerDlpRestrictions parameter."},
 				"policy":                                              schema.StringAttribute{Computed: true, Description: "Maps to the -Policy parameter."},

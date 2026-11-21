@@ -87,6 +87,50 @@ func getStringSlice(m map[string]any, key string) []string {
 	return out
 }
 
+// getIdentitySlice reads a multi-valued identity field from a read-back
+// object. The service returns these either as a JSON array of scalar values
+// (e.g. DLP rule NotifyUser) or as an array of identity objects (e.g. DLP
+// policy workload locations); object elements are reduced to their stable
+// identity instead of being stringified or dropped.
+func getIdentitySlice(m map[string]any, key string) []string {
+	v, ok := m[key]
+	if !ok || v == nil {
+		return nil
+	}
+	if s, ok := v.(string); ok && s != "" {
+		return []string{s}
+	}
+	arr, ok := v.([]any)
+	if !ok {
+		return nil
+	}
+	out := make([]string, 0, len(arr))
+	for _, e := range arr {
+		if id := identityElement(e); id != "" {
+			out = append(out, id)
+		}
+	}
+	return out
+}
+
+// identityElement extracts the stable identity from a collection element:
+// scalar strings pass through; identity objects are reduced to their first
+// populated identity field (the captured read-back shape carries Name and
+// ImmutableIdentity for tenant-wide "All" locations and mailbox/site objects).
+func identityElement(e any) string {
+	switch v := e.(type) {
+	case string:
+		return v
+	case map[string]any:
+		for _, k := range []string{"Name", "ImmutableIdentity", "Identity", "Guid", "Id", "PrimarySmtpAddress"} {
+			if s, ok := v[k].(string); ok && s != "" {
+				return s
+			}
+		}
+	}
+	return ""
+}
+
 func firstNonEmptyStr(vals ...string) string {
 	for _, v := range vals {
 		if v != "" {
